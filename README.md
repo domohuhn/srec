@@ -1,5 +1,8 @@
 # Motorola S-Record library
 
+[![Dart](https://github.com/domohuhn/srec/actions/workflows/dart.yml/badge.svg)](https://github.com/domohuhn/srec/actions/workflows/dart.yml)
+[![codecov](https://codecov.io/gh/domohuhn/srec/branch/main/graph/badge.svg?token=G0I86WZYF8)](https://codecov.io/gh/domohuhn/srec)
+
 A dart library that reads and writes [Motorola S-Record files](https://en.wikipedia.org/wiki/SREC_(file_format)) (common file extenstions: .s19, .s28, .s37, .srec). Motorola S-Record is a file format that is used to store binary data as ASCII text. It is often used to program microcontrollers. The file is comprised of record blocks. Each record block is represented as a line in the text file. A record starts with a "S" character and ends at the end of the line. The last byte of a record block is the checksum of all other bytes in this block.
 
 A record has six fields:
@@ -31,7 +34,7 @@ Each record can contain a payload of 0-255 bytes.
 To use the package, simply add it to your pupspec.yaml:
 ```yaml
 dependencies:
-  srec: ^1.0.0
+  srec: ^0.1.0
 ```
 
 And you are good to go!
