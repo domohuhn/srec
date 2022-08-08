@@ -1,6 +1,6 @@
 name: srec
 description: A Dart library that can read and write Motorola S-Record files. The Motorola S-Record is a file format that contains binary information as ASCII text. It is often used to program microcontrollers.
-version: 0.1.0
+version: 1.0.0
 repository: https://github.com/domohuhn/srec
 issue_tracker: https://github.com/domohuhn/srec/issues
 

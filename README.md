@@ -34,7 +34,7 @@ Each record can contain a payload of 0-255 bytes.
 To use the package, simply add it to your pupspec.yaml:
 ```yaml
 dependencies:
-  srec: ^0.1.0
+  srec: ^1.0.0
 ```
 
 And you are good to go!
