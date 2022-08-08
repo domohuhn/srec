@@ -43,3 +43,15 @@ jobs:
       # want to change this to 'flutter test'.
       - name: Run tests
         run: dart test
+  
+      - name: Coverage information
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          dart pub global activate coverage
+          dart pub global run coverage:test_with_coverage
+      - name: Upload coverage to Codecov
+        if: matrix.os == 'ubuntu-latest'
+        uses: codecov/codecov-action@v2
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage/lcov.info
