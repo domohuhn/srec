@@ -9,7 +9,7 @@
 ///
 /// The hex file may contain multiple instances of Memory Segments that
 /// describe the binary layout of the memory. The segments are managed via
-/// the base class of the file: MemorySegmentContainer from the intel_hex package.
+/// the base class of the file: MemorySegmentContainer from the [intel_hex](https://pub.dev/packages/intel_hex) package.
 library srec;
 
 export 'src/srec_base.dart';

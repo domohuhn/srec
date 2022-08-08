@@ -66,4 +66,4 @@ In case of bug reports or feature requests, please use the [issue tracker](https
 
 ## Dependencies
 
-The library uses the Memory Segments from the intel_hex package.
+The library uses the Memory Segments from the [intel_hex](https://pub.dev/packages/intel_hex) package.
