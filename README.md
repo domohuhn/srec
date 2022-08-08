@@ -7,12 +7,12 @@ A dart library that reads and writes [Motorola S-Record files](https://en.wikipe
 
 A record has six fields:
 
-    - Start code. Usually "S".
-    - Record type
-    - Byte count
-    - Address
-    - Data. May be empty.
-    - Checksum
+ - Start code. Usually "S".
+ - Record type
+ - Byte count
+ - Address
+ - Data. May be empty.
+ - Checksum
 
 ## Features
 
