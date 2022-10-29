@@ -43,7 +43,6 @@ import 'package:srec/srec.dart';
 
 var file = File(path).readAsStringSync();
 var srec = SRecordFile.fromString(file);
-final filesize = srec.maxAddress;
 var data = Uint8List(srec.maxAddress);
 for (final seg in srec.segments) {
   for (int i = seg.address; i < seg.endAddress; ++i) {
