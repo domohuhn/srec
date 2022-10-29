@@ -13,4 +13,4 @@
 library srec;
 
 export 'src/srec_base.dart';
-export 'src/expections.dart';
+export 'src/exception.dart';

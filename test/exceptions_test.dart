@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: BSD-3-Clause
 
-import 'package:srec/src/expections.dart';
+import 'package:srec/src/exception.dart';
 import 'package:test/test.dart';
 
 void main() {
