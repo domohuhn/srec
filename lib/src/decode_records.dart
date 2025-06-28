@@ -156,9 +156,6 @@ class SRecord {
       parsed[idx] = int.parse(line.substring(i, i + 2), radix: 16);
       idx += 1;
     }
-    if (idx != len) {
-      throw ParsingError("Expected $len hex values, parsed $idx");
-    }
     _data = Uint8List.fromList(parsed);
   }
 
