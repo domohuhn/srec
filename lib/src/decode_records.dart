@@ -148,9 +148,16 @@ class SRecord {
   Uint8List _data = Uint8List(0);
 
   void _parseHexValues(String line, int start, int end) {
-    List<int> parsed = [];
+    int len = (end - start) >> 1;
+    // we use a single allocation with generate
+    List<int> parsed = List<int>.generate(len, (i) => 0);
+    int idx = 0;
     for (var i = start; (i + 1) < end; i = (i + 2)) {
-      parsed.add(int.parse(line.substring(i, i + 2), radix: 16));
+      parsed[idx] = int.parse(line.substring(i, i + 2), radix: 16);
+      idx += 1;
+    }
+    if (idx != len) {
+      throw ParsingError("Expected $len hex values, parsed $idx");
     }
     _data = Uint8List.fromList(parsed);
   }
