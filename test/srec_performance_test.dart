@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: BSD-3-Clause
 
-import 'package:intel_hex/intel_hex.dart';
 import 'package:srec/srec.dart';
 import 'package:test/test.dart';
 
