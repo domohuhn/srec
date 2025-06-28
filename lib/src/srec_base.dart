@@ -12,15 +12,13 @@ import 'dart:math';
 class SRecordFile extends MemorySegmentContainer {
   /// Creates a file with a single segment if [address] is >= 0 and [length] is >= 0.
   /// Otherwise the file is empty.
-  SRecordFile({int? address, int? length})
-      : super(address: address, length: length);
+  SRecordFile({super.address, super.length});
 
   /// Creates a file with a single segment containing all bytes from [data].
   /// The start [address] is 0 unless another value is provided.
   ///
   /// The contents of [data] will be truncated to (0, 255).
-  SRecordFile.fromData(Iterable<int> data, {int address = 0})
-      : super.fromData(data, address: address);
+  SRecordFile.fromData(super.data, {super.address}) : super.fromData();
 
   /// The start code for a record. The standard value is "S".
   String startCode = "S";

@@ -8,7 +8,7 @@ import 'dart:typed_data';
 
 /// This file shows how to create a program that reads a file
 /// from the file system and converts it to a Motorola S-record file.
-/// The output file will be called <path>.srec.
+/// The output file will be called &lt;path&gt;.srec.
 
 void main(List<String> arguments) {
   if (arguments.isEmpty) {
@@ -28,7 +28,7 @@ void main(List<String> arguments) {
     var srec = SRecordFile.fromData(file);
     var out = File("$path.srec");
     if (out.existsSync()) {
-      print("ERROR: '$path.srec' alread exists!");
+      print("ERROR: '$path.srec' already exists!");
       exit(1);
     }
     out.writeAsStringSync(srec.toFileContents());
