@@ -119,20 +119,20 @@ class SRecordFile extends MemorySegmentContainer {
           "There are overlapping Segments in the file and allowDuplicateAddresses is set to $allowDuplicateAddresses!");
     }
     _setFunctions();
-    String rv = "";
+    final rv = StringBuffer();
 
-    rv +=
-        createHeaderRecord(header != null ? header! : "", startCode: startCode);
+    rv.write(createHeaderRecord(header != null ? header! : "",
+        startCode: startCode));
 
     for (final seg in segments) {
       for (int i = 0; i < seg.length; i = i + lineLength) {
-        rv += _dataRecord!(seg.address + i,
-            seg.slice(i, min(i + lineLength, seg.length)), startCode);
+        rv.write(_dataRecord!(seg.address + i,
+            seg.slice(i, min(i + lineLength, seg.length)), startCode));
       }
     }
 
-    rv += _endRecord!(startAddress != null ? startAddress! : 0, startCode);
-    return rv;
+    rv.write(_endRecord!(startAddress != null ? startAddress! : 0, startCode));
+    return rv.toString();
   }
 
   void _addDataRecord(SRecord record, int line, bool allowDuplicateAddresses) {

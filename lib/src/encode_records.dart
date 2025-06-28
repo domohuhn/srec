@@ -209,9 +209,9 @@ String convertToASCII(Uint8List buf, String startCode) {
     throw RangeError.range(buf.length, 3, 256, "buffer length",
         "The size of $startCode records has hard limits!");
   }
-  String rv = startCode;
+  final rv = StringBuffer(startCode);
   for (final value in buf) {
-    rv += _toHex(value);
+    rv.write(_toHex(value));
   }
   return "$rv${_toHex(computeChecksum(buf, false))}\n";
 }
