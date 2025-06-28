@@ -69,6 +69,7 @@ class SRecordFile extends MemorySegmentContainer {
     int lineNo = 0;
     int recordCount = 0;
 
+    final segmentBuilder = MemorySegmentContainerBuilder();
     for (final line in lines) {
       lineNo++;
       if (!line.startsWith(startCode)) {
@@ -81,7 +82,7 @@ class SRecordFile extends MemorySegmentContainer {
           header = record.text;
           break;
         case SRecordType.data:
-          _addDataRecord(record, lineNo, allowDuplicateAddresses);
+          _addDataRecordToSegmentList(segmentBuilder, record);
           recordCount++;
           break;
         case SRecordType.count:
@@ -98,6 +99,11 @@ class SRecordFile extends MemorySegmentContainer {
           startAddress = record.address;
           break;
       }
+    }
+    final toAdd =
+        segmentBuilder.build(allowDuplicateAddresses: allowDuplicateAddresses);
+    for (final newSegment in toAdd.segments) {
+      addSegment(newSegment);
     }
   }
 
@@ -135,14 +141,11 @@ class SRecordFile extends MemorySegmentContainer {
     return rv.toString();
   }
 
-  void _addDataRecord(SRecord record, int line, bool allowDuplicateAddresses) {
+  void _addDataRecordToSegmentList(
+      MemorySegmentContainerBuilder out, SRecord record) {
     final address = record.address;
     final seg = MemorySegment.fromBytes(address: address, data: record.payload);
-    if (!allowDuplicateAddresses && !segmentIsNew(seg)) {
-      throw ParsingError.onLine(line,
-          "The address range [${seg.address}, ${seg.endAddress}[ of the record is not unique!");
-    }
-    addSegment(seg);
+    out.add(seg);
   }
 
   Function(int, String)? _endRecord;
