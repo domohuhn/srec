@@ -149,7 +149,7 @@ class SRecord {
 
   void _parseHexValues(String line, int start, int end) {
     List<int> parsed = [];
-    for (var i = start; i < end; i = i + 2) {
+    for (var i = start; (i + 1) < end; i = (i + 2)) {
       parsed.add(int.parse(line.substring(i, i + 2), radix: 16));
     }
     _data = Uint8List.fromList(parsed);
