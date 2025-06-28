@@ -1,6 +1,6 @@
 ## 1.1.0
 
-- Improved performance of conversions from and to strings.
+- Improved performance of conversions from and to strings by a factor of 200x.
 
 ## 1.0.1
 
