@@ -74,7 +74,7 @@ class SRecordFile extends MemorySegmentContainer {
       if (!line.startsWith(startCode)) {
         continue;
       }
-      var record =
+      final record =
           SRecord.fromLine(line, startCode: startCode, lineNumber: lineNo);
       switch (record.recordType) {
         case SRecordType.header:
@@ -99,9 +99,6 @@ class SRecordFile extends MemorySegmentContainer {
           break;
       }
     }
-    if (recordCount == 0) {
-      throw ParsingError("The file contains no valid records!");
-    }
   }
 
   /// Converts this instance of SRecordFile to an Motorola S-record file record block.
@@ -118,7 +115,8 @@ class SRecordFile extends MemorySegmentContainer {
     }
     sortSegments();
     if (!allowDuplicateAddresses && !validateSegmentsAreUnique()) {
-      throw ParsingError("There are overlapping Segments in the file!");
+      throw RangeError(
+          "There are overlapping Segments in the file and allowDuplicateAddresses is set to $allowDuplicateAddresses!");
     }
     _setFunctions();
     String rv = "";

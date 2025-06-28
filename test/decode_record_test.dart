@@ -105,7 +105,11 @@ void main() {
     });
 
     test("record type", () {
-      expect(() => SRecord.fromLine("S4061334484452D5\n"), throwParsingError);
+      expect(() => SRecord.fromLine("S4061334484452D4\n"), throwParsingError);
+    });
+
+    test("wrong start code", () {
+      expect(() => SRecord.fromLine("A0061334484452D5\n"), throwParsingError);
     });
   });
 }

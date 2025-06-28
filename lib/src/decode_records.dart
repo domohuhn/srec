@@ -65,7 +65,7 @@ class SRecord {
     return Uint8List.sublistView(_data, _payloadOffset, _data.length - 1);
   }
 
-  /// Constructs the srecord by parsing a string given via [line].
+  /// Constructs the s-record by parsing a string given via [line].
   /// The start code can be configured with [startCode].
   ///
   /// In case the line cannot be parsed, exceptions will be thrown. For better error reporting,
