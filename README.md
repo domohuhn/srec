@@ -3,7 +3,7 @@
 [![Dart](https://github.com/domohuhn/srec/actions/workflows/dart.yml/badge.svg)](https://github.com/domohuhn/srec/actions/workflows/dart.yml)
 [![codecov](https://codecov.io/gh/domohuhn/srec/branch/main/graph/badge.svg?token=G0I86WZYF8)](https://codecov.io/gh/domohuhn/srec)
 
-A dart library that reads and writes [Motorola S-Record files](https://en.wikipedia.org/wiki/SREC_(file_format)) (common file extenstions: .s19, .s28, .s37, .srec). Motorola S-Record is a file format that is used to store binary data as ASCII text. It is often used to program microcontrollers. The file is comprised of record blocks. Each record block is represented as a line in the text file. A record starts with a "S" character and ends at the end of the line. The last byte of a record block is the checksum of all other bytes in this block.
+A dart library that reads and writes [Motorola S-Record files](https://en.wikipedia.org/wiki/SREC_(file_format)) (common file extensions: .s19, .s28, .s37, .srec). Motorola S-Record is a file format that is used to store binary data as ASCII text. It is often used to program microcontrollers. The file is comprised of record blocks. Each record block is represented as a line in the text file. A record starts with a "S" character and ends at the end of the line. The last byte of a record block is the checksum of all other bytes in this block.
 
 A record has six fields:
 
@@ -25,16 +25,16 @@ The following record types can be parsed:
 | Header | S0 | A meta data field with a description of the following records. |
 | Data  | S1, S2, S3 | A normal data field. |
 | Count | S5, S6 | The count of previous S1, S2 and S3 records. |
-| Start Address (termination) | S7, S8, S9 | A data field that holds the initial intruction pointer for 80x86 CPUs and terminates a record block. |
+| Start Address (termination) | S7, S8, S9 | A data field that holds the initial instruction pointer and terminates the record block. |
 
 Each record can contain a payload of 0-255 bytes.
 
 ## Getting started
 
-To use the package, simply add it to your pupspec.yaml:
+To use the package, simply add it to your pubspec.yaml:
 ```yaml
 dependencies:
-  srec: ^1.0.0
+  srec: ^1.1.0
 ```
 
 And you are good to go!
