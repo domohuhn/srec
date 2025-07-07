@@ -62,42 +62,51 @@ class SRecordFile extends MemorySegmentContainer {
       bool ignoreCount = false})
       : super() {
     if (startToken != null) {
+      if (startToken.length != 1) {
+        throw ParsingError(
+            "The startToken string can only be 1 character long, got ${startToken.length} - string: '$startToken'");
+      }
       startCode = startToken;
     }
-    final re = RegExp(r'[\r\n]+');
-    final lines = data.split(re);
+    int startCodePoint = startCode.codeUnits.first;
     int lineNo = 0;
     int recordCount = 0;
+    bool lastCharWasNewline = true;
+    final codeUnits = data.codeUnits;
 
     final segmentBuilder = MemorySegmentContainerBuilder();
-    for (final line in lines) {
-      lineNo++;
-      if (!line.startsWith(startCode)) {
-        continue;
+    for (int i = 0; i < codeUnits.length; ++i) {
+      if (lastCharWasNewline && codeUnits[i] == startCodePoint) {
+        final record = SRecord.fromCodeUnits(data.codeUnits, i,
+            startCodePoint: startCodePoint, lineNumber: lineNo);
+        switch (record.recordType) {
+          case SRecordType.header:
+            header = record.text;
+            break;
+          case SRecordType.data:
+            _addDataRecordToSegmentList(segmentBuilder, record);
+            recordCount++;
+            break;
+          case SRecordType.count:
+            if (record.count != recordCount && !ignoreCount) {
+              throw ParsingError.onLine(lineNo,
+                  "Actual record count of $recordCount records does not match the declared count ${record.count}");
+            }
+            break;
+          case SRecordType.startAddress:
+            if (startAddress != null) {
+              throw ParsingError.onLine(lineNo,
+                  "Start address record (S7,S8,S9) occurs more than once!");
+            }
+            startAddress = record.address;
+            break;
+        }
+        i += record.stringLength;
       }
-      final record =
-          SRecord.fromLine(line, startCode: startCode, lineNumber: lineNo);
-      switch (record.recordType) {
-        case SRecordType.header:
-          header = record.text;
-          break;
-        case SRecordType.data:
-          _addDataRecordToSegmentList(segmentBuilder, record);
-          recordCount++;
-          break;
-        case SRecordType.count:
-          if (record.count != recordCount && !ignoreCount) {
-            throw ParsingError.onLine(lineNo,
-                "Actual record count of $recordCount records does not match the declared count ${record.count}");
-          }
-          break;
-        case SRecordType.startAddress:
-          if (startAddress != null) {
-            throw ParsingError.onLine(lineNo,
-                "Start address record (S7,S8,S9) occurs more than once!");
-          }
-          startAddress = record.address;
-          break;
+      lastCharWasNewline = false;
+      if (i < codeUnits.length && codeUnits[i] == 0x0A) {
+        lineNo++;
+        lastCharWasNewline = true;
       }
     }
     final toAdd =

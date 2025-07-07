@@ -1,3 +1,7 @@
+## 1.2.0
+
+- Avoid extra copies to improve performance
+
 ## 1.1.0
 
 - Improved performance of conversions from and to strings by a factor of 200x.

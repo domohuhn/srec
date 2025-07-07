@@ -22,6 +22,25 @@ enum SRecordType {
   startAddress
 }
 
+int _convertHexCodePointToInt(int codePoint) {
+  if (0x30 <= codePoint && codePoint <= 0x39) {
+    return codePoint - 0x30;
+  }
+  if (0x41 <= codePoint && codePoint <= 0x46) {
+    return 10 + codePoint - 0x41;
+  }
+  if (0x61 <= codePoint && codePoint <= 0x66) {
+    return 10 + codePoint - 0x61;
+  }
+  throw ParsingError("Failed to convert code point $codePoint to a number.");
+}
+
+int _createU8FromUnicodeCodePoints(int highNibble, int lowNibble) {
+  int hi = _convertHexCodePointToInt(highNibble);
+  int lo = _convertHexCodePointToInt(lowNibble);
+  return (hi << 4) | lo;
+}
+
 class SRecord {
   SRecordType recordType = SRecordType.data;
   String _header = "";
@@ -83,65 +102,104 @@ class SRecord {
           "line length",
           "SRecords have a minimum length! Line $lineNumber is out of range!");
     }
-    final recordString = line.substring(startCode.length, startCode.length + 1);
-    final byteLen = int.parse(
-        line.substring(startCode.length + 1, startCode.length + 3),
-        radix: 16);
+    final codeUnits = line.codeUnits;
+    final recordId = line.codeUnits[startCode.length];
+    final byteLen = _createU8FromUnicodeCodePoints(
+        codeUnits[startCode.length + 1], codeUnits[startCode.length + 2]);
     final requiredLength = startCode.length + 3 + 2 * byteLen;
     if (line.length < requiredLength) {
       throw RangeError.range(line.length, requiredLength, null, "line length",
           "The SRecord in line $lineNumber claims to have $byteLen bytes, requiring at least $requiredLength characters!");
     }
     _parseHexValues(line, startCode.length + 1, requiredLength);
+    _finalize(recordId, lineNumber);
+  }
+
+  SRecord.fromCodeUnits(List<int> codeUnits, int startOffset,
+      {int startCodePoint = 0x53, int lineNumber = 1}) {
+    final runes = codeUnits;
+    if (codeUnits.length < startOffset + 8) {
+      throw ParsingError.onLine(lineNumber,
+          "Line is too short! The shortest possible record is 8 bytes - got ${codeUnits.length - startOffset} characters");
+    }
+
+    if (runes[startOffset] != startCodePoint) {
+      throw ParsingError.onLine(lineNumber,
+          "Line does not start with start code '${String.fromCharCode(startCodePoint)}' - found '${String.fromCharCode(runes[startOffset])}' - failed to find start of record!");
+    }
+
+    final recordId = codeUnits[startOffset + 1];
+    final byteLen = _createU8FromUnicodeCodePoints(
+        codeUnits[startOffset + 2], codeUnits[startOffset + 3]);
+    final requiredLength = 4 + 2 * byteLen;
+    final expectedRecordEnd = startOffset + requiredLength;
+
+    if (codeUnits.length < expectedRecordEnd) {
+      throw ParsingError.onLine(lineNumber,
+          "Line is too short! Expected $requiredLength characters - got ${codeUnits.length - startOffset} characters");
+    }
+
+    _data = Uint8List(byteLen + 1);
+    int idx = 0;
+    for (var i = startOffset + 2; i + 1 < expectedRecordEnd; i = i + 2) {
+      _data[idx] = _createU8FromUnicodeCodePoints(runes[i], runes[i + 1]);
+      idx += 1;
+    }
+    _finalize(recordId, lineNumber);
+  }
+
+  int get stringLength => _data.length * 2 + 2;
+
+  void _finalize(int recordId, int lineNumber) {
     if (!validateChecksum(_data, 255)) {
       throw ParsingError.onLine(lineNumber,
           "Checksum does not match! Expected: ${computeChecksum(_data.sublist(0, _data.length - 1), false)} Got: ${_data.last}");
     }
 
-    switch (recordString) {
-      case "0":
+    switch (recordId) {
+      case 0x30:
         recordType = SRecordType.header;
         _address = _parse2ByteAddress();
         _decodeString();
         break;
-      case "1":
+      case 0x31:
         recordType = SRecordType.data;
         _address = _parse2ByteAddress();
         _payloadOffset = 3;
         break;
-      case "2":
+      case 0x32:
         recordType = SRecordType.data;
         _address = _parse3ByteAddress();
         _payloadOffset = 4;
         break;
-      case "3":
+      case 0x33:
         recordType = SRecordType.data;
         _address = _parse4ByteAddress();
         _payloadOffset = 5;
         break;
-      case "5":
+      case 0x35:
         recordType = SRecordType.count;
         _address = _parse2ByteAddress();
         break;
-      case "6":
+      case 0x36:
         recordType = SRecordType.count;
         _address = _parse3ByteAddress();
         break;
-      case "7":
+      case 0x37:
         recordType = SRecordType.startAddress;
         _address = _parse4ByteAddress();
         break;
-      case "8":
+      case 0x38:
         recordType = SRecordType.startAddress;
         _address = _parse3ByteAddress();
         break;
-      case "9":
+      case 0x39:
         recordType = SRecordType.startAddress;
         _address = _parse2ByteAddress();
         break;
       default:
         throw ParsingError.onLine(lineNumber,
-            "Only record types 0,1,2,3,5,6,7,8,9 are valid! Got: '$recordString'");
+            "Only record types 0,1,2,3,5,6,7,8,9 are valid! Got: '${String.fromCharCode(recordId)}}'");
     }
   }
 
@@ -149,14 +207,13 @@ class SRecord {
 
   void _parseHexValues(String line, int start, int end) {
     int len = (end - start) >> 1;
-    // we use a single allocation with generate
-    List<int> parsed = List<int>.generate(len, (i) => 0);
+    _data = Uint8List(len);
     int idx = 0;
     for (var i = start; (i + 1) < end; i = (i + 2)) {
-      parsed[idx] = int.parse(line.substring(i, i + 2), radix: 16);
+      _data[idx] = _createU8FromUnicodeCodePoints(
+          line.codeUnits[i], line.codeUnits[i + 1]);
       idx += 1;
     }
-    _data = Uint8List.fromList(parsed);
   }
 
   int _parse2ByteAddress() {
