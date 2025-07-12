@@ -111,5 +111,40 @@ void main() {
     test("wrong start code", () {
       expect(() => SRecord.fromLine("A0061334484452D5\n"), throwParsingError);
     });
+
+    test("wrong Character", () {
+      expect(() => SRecord.fromLine("S006133G484452D5\n"), throwParsingError);
+    });
+
+    test("empty code units", () {
+      List<int> input = [];
+      expect(() => SRecord.fromCodeUnits(input, 0), throwParsingError);
+    });
+
+    test("wrong start code", () {
+      List<int> input = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+      expect(() => SRecord.fromCodeUnits(input, 0), throwParsingError);
+    });
+
+    test("wrong length", () {
+      List<int> input = [
+        0x53,
+        0x31,
+        0xFF,
+        0xFF,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ];
+      expect(() => SRecord.fromCodeUnits(input, 0), throwParsingError);
+    });
   });
 }

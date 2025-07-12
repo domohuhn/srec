@@ -160,11 +160,11 @@ class SRecordFile extends MemorySegmentContainer {
 
   /// Sets the record functions to the correct functions.
   void _setFunctions() {
-    final maxAddr = maxAddress;
-    if (maxAddr <= 65536) {
+    final bytes = requiredAddressBytes;
+    if (bytes == 2) {
       _dataRecord = createData16Record;
       _endRecord = createStartAddress16Record;
-    } else if (maxAddr <= 1048576) {
+    } else if (bytes == 3) {
       _dataRecord = createData24Record;
       _endRecord = createStartAddress24Record;
     } else {
@@ -174,11 +174,15 @@ class SRecordFile extends MemorySegmentContainer {
   }
 
   /// Returns the required number of address bytes
-  int get addressBytes => maxAddress <= 65536
-      ? 2
-      : maxAddress <= 1048575
-          ? 3
-          : 4;
+  int get requiredAddressBytes {
+    if (maxAddress <= 65536) {
+      return 2;
+    }
+    if (maxAddress <= 1048576) {
+      return 3;
+    }
+    return 4;
+  }
 
   /// Prints information about the file and its contents.
   @override
