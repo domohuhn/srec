@@ -1,6 +1,7 @@
 ## 1.2.0
 
-- Avoid extra copies to improve performance
+- Avoid extra copies to improve performance.
+- The functions to encode records now write to a string buffer instead of returning a string.
 
 ## 1.1.0
 

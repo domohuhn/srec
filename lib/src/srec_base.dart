@@ -136,17 +136,15 @@ class SRecordFile extends MemorySegmentContainer {
     _setFunctions();
     final rv = StringBuffer();
 
-    rv.write(createHeaderRecord(header != null ? header! : "",
-        startCode: startCode));
-
+    createHeaderRecord(rv, header != null ? header! : "", startCode: startCode);
     for (final seg in segments) {
       for (int i = 0; i < seg.length; i = i + lineLength) {
-        rv.write(_dataRecord!(seg.address + i,
-            seg.slice(i, min(i + lineLength, seg.length)), startCode));
+        _dataRecord!(rv, seg.address + i,
+            seg.slice(i, min(i + lineLength, seg.length)), startCode);
       }
     }
 
-    rv.write(_endRecord!(startAddress != null ? startAddress! : 0, startCode));
+    _endRecord!(rv, startAddress != null ? startAddress! : 0, startCode);
     return rv.toString();
   }
 
@@ -157,8 +155,8 @@ class SRecordFile extends MemorySegmentContainer {
     out.add(seg);
   }
 
-  Function(int, String)? _endRecord;
-  Function(int, Iterable<int>, String)? _dataRecord;
+  Function(StringBuffer, int, String)? _endRecord;
+  Function(StringBuffer, int, Iterable<int>, String)? _dataRecord;
 
   /// Sets the record functions to the correct functions.
   void _setFunctions() {
@@ -174,6 +172,13 @@ class SRecordFile extends MemorySegmentContainer {
       _endRecord = createStartAddress32Record;
     }
   }
+
+  /// Returns the required number of address bytes
+  int get addressBytes => maxAddress <= 65536
+      ? 2
+      : maxAddress <= 1048575
+          ? 3
+          : 4;
 
   /// Prints information about the file and its contents.
   @override

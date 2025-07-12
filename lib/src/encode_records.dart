@@ -16,7 +16,7 @@ import 'dart:convert';
 /// Example: "S00F000068656C6C6F202020202000003C"
 ///
 /// A different start token than "S" can be provided via [startCode].
-String createHeaderRecord(String header,
+void createHeaderRecord(StringBuffer str, String header,
     {int address = 0, String startCode = "S"}) {
   var list = utf8.encode(header);
   final length = 3 + list.length;
@@ -28,7 +28,7 @@ String createHeaderRecord(String header,
   }
   data.buffer.asByteData(1, 2).setUint16(0, address, Endian.big);
   data.setAll(3, list);
-  return convertToASCII(data, "${startCode}0");
+  convertToASCII(str, data, "${startCode}0");
 }
 
 /// Creates a data record from the given 16 bit [address] and [data].
@@ -39,7 +39,7 @@ String createHeaderRecord(String header,
 /// Example: "S1137AF00A0A0D0000000000000000000000000061"
 ///
 /// A different start token than "S" can be provided via [startCode].
-String createData16Record(int address, Iterable<int> data,
+void createData16Record(StringBuffer str, int address, Iterable<int> data,
     [String startCode = "S"]) {
   final length = 3 + data.length;
   var buffer = Uint8List(length);
@@ -50,7 +50,7 @@ String createData16Record(int address, Iterable<int> data,
   }
   buffer.buffer.asByteData(1, 2).setUint16(0, address, Endian.big);
   buffer.setAll(3, data);
-  return convertToASCII(buffer, "${startCode}1");
+  convertToASCII(str, buffer, "${startCode}1");
 }
 
 /// Creates a data record from the given 24 bit [address] and [data].
@@ -61,7 +61,7 @@ String createData16Record(int address, Iterable<int> data,
 /// Example: "S2137AF00A0A0D0000000000000000000000000061"
 ///
 /// A different start token than "S" can be provided via [startCode].
-String createData24Record(int address, Iterable<int> data,
+void createData24Record(StringBuffer str, int address, Iterable<int> data,
     [String startCode = "S"]) {
   final length = 4 + data.length;
   var buffer = Uint8List(length);
@@ -74,7 +74,7 @@ String createData24Record(int address, Iterable<int> data,
   buffer[2] = (address >> 8) & 0xFF;
   buffer[3] = (address >> 0) & 0xFF;
   buffer.setAll(4, data);
-  return convertToASCII(buffer, "${startCode}2");
+  convertToASCII(str, buffer, "${startCode}2");
 }
 
 /// Creates a data record from the given 32 bit [address] and [data].
@@ -85,7 +85,7 @@ String createData24Record(int address, Iterable<int> data,
 /// Example: "S3137AF00A0A0D0000000000000000000000000061"
 ///
 /// A different start token than "S" can be provided via [startCode].
-String createData32Record(int address, Iterable<int> data,
+void createData32Record(StringBuffer str, int address, Iterable<int> data,
     [String startCode = "S"]) {
   final length = 5 + data.length;
   var buffer = Uint8List(length);
@@ -96,7 +96,7 @@ String createData32Record(int address, Iterable<int> data,
   }
   buffer.buffer.asByteData(1, 4).setUint32(0, address, Endian.big);
   buffer.setAll(5, data);
-  return convertToASCII(buffer, "${startCode}3");
+  convertToASCII(str, buffer, "${startCode}3");
 }
 
 /// Creates a data count record from the given 16 bit [count].
@@ -107,7 +107,8 @@ String createData32Record(int address, Iterable<int> data,
 /// Example: "S5030003F9"
 ///
 /// A different start token than "S" can be provided via [startCode].
-String createCount16Record(int count, [String startCode = "S"]) {
+void createCount16Record(StringBuffer str, int count,
+    [String startCode = "S"]) {
   final length = 3;
   var buffer = Uint8List(length);
   buffer[0] = length;
@@ -116,7 +117,8 @@ String createCount16Record(int count, [String startCode = "S"]) {
         "There are only 2 bytes for the count in a S5 data record!");
   }
   buffer.buffer.asByteData(1, 2).setUint16(0, count, Endian.big);
-  return convertToASCII(buffer, "${startCode}5");
+
+  convertToASCII(str, buffer, "${startCode}5");
 }
 
 /// Creates a data count record from the given 24 bit [count].
@@ -127,7 +129,8 @@ String createCount16Record(int count, [String startCode = "S"]) {
 /// Example: "S604000300F8"
 ///
 /// A different start token than "S" can be provided via [startCode].
-String createCount24Record(int count, [String startCode = "S"]) {
+void createCount24Record(StringBuffer str, int count,
+    [String startCode = "S"]) {
   final length = 4;
   var buffer = Uint8List(length);
   buffer[0] = length;
@@ -138,7 +141,7 @@ String createCount24Record(int count, [String startCode = "S"]) {
   buffer[1] = (count >> 16) & 0xFF;
   buffer[2] = (count >> 8) & 0xFF;
   buffer[3] = (count >> 0) & 0xFF;
-  return convertToASCII(buffer, "${startCode}6");
+  convertToASCII(str, buffer, "${startCode}6");
 }
 
 /// Creates a Start Address (Termination) record for a block of Data16 records.
@@ -149,7 +152,8 @@ String createCount24Record(int count, [String startCode = "S"]) {
 /// Example: "S9030003F9"
 ///
 /// A different start token than "S" can be provided via [startCode].
-String createStartAddress16Record(int startAddress, [String startCode = "S"]) {
+void createStartAddress16Record(StringBuffer str, int startAddress,
+    [String startCode = "S"]) {
   final length = 3;
   var buffer = Uint8List(length);
   buffer[0] = length;
@@ -158,7 +162,7 @@ String createStartAddress16Record(int startAddress, [String startCode = "S"]) {
         "There are only 2 bytes for the startAddress in a S9 data record!");
   }
   buffer.buffer.asByteData(1, 2).setUint16(0, startAddress, Endian.big);
-  return convertToASCII(buffer, "${startCode}9");
+  convertToASCII(str, buffer, "${startCode}9");
 }
 
 /// Creates a Start Address (Termination) record for a block of Data24 records.
@@ -169,7 +173,8 @@ String createStartAddress16Record(int startAddress, [String startCode = "S"]) {
 /// Example: "S804000003F8"
 ///
 /// A different start token than "S" can be provided via [startCode].
-String createStartAddress24Record(int startAddress, [String startCode = "S"]) {
+void createStartAddress24Record(StringBuffer str, int startAddress,
+    [String startCode = "S"]) {
   final length = 4;
   var buffer = Uint8List(length);
   buffer[0] = length;
@@ -180,7 +185,8 @@ String createStartAddress24Record(int startAddress, [String startCode = "S"]) {
   buffer[1] = (startAddress >> 16) & 0xFF;
   buffer[2] = (startAddress >> 8) & 0xFF;
   buffer[3] = (startAddress >> 0) & 0xFF;
-  return convertToASCII(buffer, "${startCode}8");
+
+  convertToASCII(str, buffer, "${startCode}8");
 }
 
 /// Creates a Start Address (Termination) record for a block of Data32 records.
@@ -191,7 +197,8 @@ String createStartAddress24Record(int startAddress, [String startCode = "S"]) {
 /// Example: "S70500000003F7"
 ///
 /// A different start token than "S" can be provided via [startCode].
-String createStartAddress32Record(int startAddress, [String startCode = "S"]) {
+void createStartAddress32Record(StringBuffer str, int startAddress,
+    [String startCode = "S"]) {
   final length = 5;
   var buffer = Uint8List(length);
   buffer[0] = length;
@@ -200,20 +207,22 @@ String createStartAddress32Record(int startAddress, [String startCode = "S"]) {
         "There are only 4 bytes for the startAddress in a S7 data record!");
   }
   buffer.buffer.asByteData(1, 4).setUint32(0, startAddress, Endian.big);
-  return convertToASCII(buffer, "${startCode}7");
+
+  convertToASCII(str, buffer, "${startCode}7");
 }
 
 /// Converts the buffer [buf] to a hex string. The [startCode] is prepended.
-String convertToASCII(Uint8List buf, String startCode) {
+void convertToASCII(StringBuffer str, Uint8List buf, String startCode) {
   if (buf.length < 3 || buf.length > 256) {
     throw RangeError.range(buf.length, 3, 256, "buffer length",
         "The size of $startCode records has hard limits!");
   }
-  final rv = StringBuffer(startCode);
+  str.write(startCode);
   for (final value in buf) {
-    rv.write(_toHex(value));
+    str.write(_toHex(value));
   }
-  return "$rv${_toHex(computeChecksum(buf, false))}\n";
+  str.write(_toHex(computeChecksum(buf, false)));
+  str.write('\n');
 }
 
 /// Converts num to 2 hex digits. The value is truncated to 0-255.
