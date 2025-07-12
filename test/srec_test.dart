@@ -105,6 +105,12 @@ S9030000FC""";
           throwsA(TypeMatcher<ParsingError>()));
     });
 
+    test('Wrong start code', () {
+      final exampleFile = "";
+      expect(() => SRecordFile.fromString(exampleFile, startToken: "bla"),
+          throwsA(TypeMatcher<ParsingError>()));
+    });
+
     test('Wrong count record', () {
       final exampleFile = """S00D000068656C6C6F20202020203E
 S11F00007C0802A6900100049421FFF07C6C1B787C8C23783C6000003863000026
