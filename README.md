@@ -34,7 +34,7 @@ Each record can contain a payload of 0-255 bytes.
 To use the package, simply add it to your pubspec.yaml:
 ```yaml
 dependencies:
-  srec: ^1.1.0
+  srec: ^1.2.0
 ```
 
 And you are good to go!
